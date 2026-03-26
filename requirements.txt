@@ -1,0 +1,179 @@
+PROJECT: Job Market Trend Analyzer (with Role-Based Skill Gap Analysis)
+
+We are building a system that analyzes job postings to identify trending skills and perform role-specific skill gap analysis.
+
+------------------------------------
+
+🎯 CORE FEATURES:
+
+1. Trending Skills Analyzer
+- Input: Job dataset
+- Output: Top trending skills across market
+
+2. Role-Based Skill Gap Analyzer (IMPORTANT)
+- Input: User skills + job role (e.g., "Java Developer")
+- Output: Missing skills ONLY for that role
+
+Example:
+User: ["java"]
+Role: "java developer"
+
+System should NOT suggest:
+❌ python, ❌ sql (if not relevant)
+
+Instead suggest:
+✅ spring, ✅ microservices, etc.
+
+👉 This makes the system intelligent and realistic
+
+3. Text Analyzer (Optional)
+- Extract skills from job description
+
+------------------------------------
+
+🧠 CORE IDEA (VERY IMPORTANT):
+
+We DO NOT compare with all jobs.
+
+We FILTER jobs by role first.
+
+Flow:
+Job Dataset → Filter by role → Extract skills → Find trends → Compare with user → Skill gap
+
+------------------------------------
+
+📁 PROJECT STRUCTURE:
+
+job-trend-analyzer/
+│
+├── data/
+│   └── postings.csv   (NOT pushed to GitHub)
+│
+├── ml/
+│   ├── preprocess.py      ← handles role filtering
+│   ├── extract_skills.py
+│   ├── trend_analysis.py
+│
+├── backend/
+│   └── main.py
+│
+├── frontend/
+│   ├── index.html
+│   ├── script.js
+│   ├── style.css
+│
+├── requirements.txt
+└── README.md
+
+------------------------------------
+
+🧠 ML LOGIC:
+
+We use keyword-based skill extraction:
+
+skills_list = [
+  "python", "java", "sql", "aws", "excel",
+  "machine learning", "data analysis",
+  "power bi", "tableau",
+  "react", "node", "docker",
+  "kubernetes", "spark", "hadoop",
+  "spring", "hibernate", "microservices"
+]
+
+------------------------------------
+
+⚙️ IMPORTANT FUNCTION (ROLE FILTERING):
+
+In preprocess.py:
+
+def load_data(role=None):
+    df = pd.read_csv("data/postings.csv", nrows=5000, encoding="latin1")
+
+    df = df.dropna(subset=["description", "title"])
+
+    if role:
+        df = df[df["title"].str.lower().str.contains(role.lower())]
+
+    return df["description"].tolist()
+
+------------------------------------
+
+⚙️ BACKEND (FastAPI):
+
+POST /skill-gap
+
+Input:
+{
+  "skills": ["java"],
+  "role": "java developer"
+}
+
+Logic:
+- Filter jobs by role
+- Extract skills from those jobs
+- Get trending skills for that role
+- Compare with user skills
+
+Output:
+{
+  "role": "java developer",
+  "missing_skills": ["spring", "microservices"]
+}
+
+------------------------------------
+
+🎨 FRONTEND:
+
+- Input: skills + role
+- Button → analyze gap
+- Show missing skills
+- Show trending skills (chart)
+
+------------------------------------
+
+👨‍💻 TEAM RESPONSIBILITIES:
+
+🧠 ML:
+- Skill extraction
+- Role filtering
+- Trend analysis
+
+👨‍💻 Backend:
+- Implement role-based APIs
+- Optimize performance
+- Clean API responses
+
+👩‍💻 Frontend:
+- Input form (skills + role)
+- Display results
+- Connect APIs
+
+🎨 UI/UX:
+- Design dashboard
+- Improve usability
+
+------------------------------------
+
+⚠️ IMPORTANT RULES:
+
+- DO NOT compare with all jobs
+- ALWAYS filter by role
+- This is the main intelligence of the system
+
+------------------------------------
+
+🚀 HOW TO RUN:
+
+Backend:
+uvicorn backend.main:app --reload
+
+Frontend:
+Open index.html
+
+------------------------------------
+
+🎯 GOAL:
+
+Build a system that gives REALISTIC career guidance by analyzing job trends specific to a role.
+
+----------------------------
