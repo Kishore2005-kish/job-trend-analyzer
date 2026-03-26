@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Job Market Analyzer</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f7fa;
+  text-align: center;
+}
+
+.container {
+  width: 600px;
+  margin: auto;
+  margin-top: 50px;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+input {
+  padding: 10px;
+  width: 70%;
+  margin: 5px;
+}
+
+button {
+  padding: 10px;
+  margin: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+}
+
+canvas {
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Job Market Trend Analyzer</h2>
+
+<input id="skills" placeholder="Enter skills (comma separated)">
+<br>
+<input id="role" placeholder="Enter role (e.g. java developer)">
+<br>
+
+<button onclick="checkGap()">Analyze Skill Gap</button>
+<button onclick="loadTrending()">Show Trending Skills</button>
+
+<p id="result"></p>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<script>
+
+function checkGap() {
+  const skills = document.getElementById("skills").value.split(",");
+  const role = document.getElementById("role").value;
+
+  fetch("http://127.0.0.1:8000/skill-gap", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ skills, role })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("result").innerHTML =
+      "<b>Missing Skills:</b><br>" +
+      data.missing_skills.join(", ") +
+      "<br><br><b>Recommendation:</b> " + data.recommendation;
+  });
+}
+
+function loadTrending() {
+  fetch("http://127.0.0.1:8000/trending")
+    .then(res => res.json())
+    .then(data => {
+      const ctx = document.getElementById("chart").getContext("2d");
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: "Trending Skills",
+            data: data.values
+          }]
+        }
+      });
+    });
+}
+
+</script>
+
+</body>
+</html>
